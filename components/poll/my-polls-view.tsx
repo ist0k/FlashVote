@@ -39,7 +39,7 @@ function PollCard({ poll, locale }: { poll: OwnedPollSummary; locale: Locale }) 
       >
         <Card className="transition-colors hover:bg-muted/50">
           <CardHeader>
-            <CardTitle className="text-base leading-snug text-balance">
+            <CardTitle className="text-base leading-snug break-words text-balance">
               {poll.question}
             </CardTitle>
             <CardDescription>

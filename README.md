@@ -1,4 +1,4 @@
-# FlashVote1
+﻿# FlashVote
 
 [🇷🇺 Русская версия](README.ru.md)
 

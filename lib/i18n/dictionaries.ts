@@ -1,7 +1,7 @@
-import type { Locale } from "@/lib/i18n/config";
+﻿import type { Locale } from "@/lib/i18n/config";
 
 const en = {
-  brand: "FlashVote1",
+  brand: "FlashVote",
   nav: {
     create: "Create",
     myPolls: "My polls",
@@ -10,7 +10,7 @@ const en = {
     heading: "Ask anything.",
     headingAccent: "Watch the answers roll in live.",
     subtitle:
-      "FlashVote1 turns a question into a shareable poll with real-time results — no accounts, no friction.",
+      "FlashVote turns a question into a shareable poll with real-time results — no accounts, no friction.",
     featuresLabel: "Features",
     instant: { title: "Instant", text: "No sign-up required — write a question and go." },
     shareable: { title: "Shareable", text: "Send a link or let people scan the QR code." },
@@ -139,7 +139,7 @@ const en = {
     retry: "Try again",
   },
   metadata: {
-    defaultTitle: "FlashVote1 — real-time polls",
+    defaultTitle: "FlashVote — real-time polls",
     description:
       "Create a poll in seconds, share the link or QR code, and watch votes come in live.",
   },
@@ -148,7 +148,7 @@ const en = {
 export type Dictionary = typeof en;
 
 const ru: Dictionary = {
-  brand: "FlashVote1",
+  brand: "FlashVote",
   nav: {
     create: "Создать",
     myPolls: "Мои опросы",
@@ -157,7 +157,7 @@ const ru: Dictionary = {
     heading: "Спросите о чём угодно —",
     headingAccent: "и смотрите ответы в реальном времени.",
     subtitle:
-      "FlashVote1 превращает вопрос в опрос с общей ссылкой и живыми результатами — без регистрации и лишних шагов.",
+      "FlashVote превращает вопрос в опрос с общей ссылкой и живыми результатами — без регистрации и лишних шагов.",
     featuresLabel: "Возможности",
     instant: { title: "Мгновенно", text: "Без регистрации — напишите вопрос и вперёд." },
     shareable: {
@@ -290,7 +290,7 @@ const ru: Dictionary = {
     retry: "Повторить",
   },
   metadata: {
-    defaultTitle: "FlashVote1 — опросы в реальном времени",
+    defaultTitle: "FlashVote — опросы в реальном времени",
     description:
       "Создайте опрос за секунды, поделитесь ссылкой или QR-кодом и смотрите, как приходят голоса.",
   },

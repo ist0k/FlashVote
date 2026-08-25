@@ -84,7 +84,7 @@ export function ManagePanel({ slug, status }: ManagePanelProps) {
       aria-label={dict.manage.title}
       className="flex animate-in fade-in slide-in-from-bottom-2 flex-col gap-4 rounded-xl border bg-card p-4 text-card-foreground duration-500 sm:p-5"
     >
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
         <h2 className="font-heading font-semibold">{dict.manage.title}</h2>
         <Badge variant={status === "open" ? "secondary" : "outline"}>
           {status === "open" ? dict.manage.badgeAccepting : dict.manage.badgeClosed}

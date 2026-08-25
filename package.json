@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "test:e2e": "node e2e/polls.e2e.mjs"
+    "test:e2e": "node e2e/polls.e2e.mjs",
+    "test:responsive": "node e2e/responsive.e2e.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.4",

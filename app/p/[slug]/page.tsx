@@ -18,7 +18,7 @@ export async function generateMetadata({
   const { slug } = await params;
   const poll = await getPollBySlug(slug);
   if (!poll) return { title: "404" };
-  return { title: poll.question, description: "Vote in this poll on FlashVote1." };
+  return { title: poll.question, description: "Vote in this poll on FlashVote." };
 }
 
 export default async function PollPage({ params }: PollPageProps) {

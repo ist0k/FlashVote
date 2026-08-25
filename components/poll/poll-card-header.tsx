@@ -17,7 +17,7 @@ export function PollCardHeader({ question, isOwner }: PollCardHeaderProps) {
 
   return (
     <CardHeader>
-      <CardTitle className="font-heading text-2xl leading-snug text-balance sm:text-3xl">
+      <CardTitle className="font-heading text-2xl leading-snug break-words text-balance sm:text-3xl">
         {question}
       </CardTitle>
       <CardDescription>
