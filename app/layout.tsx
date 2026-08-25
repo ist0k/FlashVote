@@ -20,8 +20,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "FlashVote1 — real-time polls",
-    template: "%s · FlashVote1",
+    default: "FlashVote — real-time polls",
+    template: "%s · FlashVote",
   },
   description:
     "Create a poll in seconds, share the link or QR code, and watch votes come in live.",
@@ -34,7 +34,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col bg-background text-foreground">
+      <body className="flex min-h-full flex-col overflow-x-clip bg-background text-foreground">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

@@ -176,7 +176,7 @@ export function PollView({ poll: initialPoll, viewerVotedOptionId }: PollViewPro
               key={option.id}
               variant="outline"
               size="lg"
-              className="h-auto w-full justify-start px-4 py-3 text-left whitespace-normal transition-all duration-150 hover:-translate-y-px hover:border-primary/40 hover:bg-accent/50 active:translate-y-0 active:scale-[0.99]"
+              className="h-auto w-full justify-start px-4 py-3 text-left whitespace-normal break-words transition-all duration-150 hover:-translate-y-px hover:border-primary/40 hover:bg-accent/50 active:translate-y-0 active:scale-[0.99]"
               disabled={!isOpen || pendingOptionId !== null}
               onClick={() => void handleVote(option.id)}
             >

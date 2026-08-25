@@ -33,13 +33,13 @@ export function LanguageSwitcher() {
           role="group"
           aria-label="Language"
         >
-          <LanguagesIcon className="mx-1 size-3.5 text-muted-foreground" aria-hidden />
+          <LanguagesIcon className="mx-0.5 size-3.5 text-muted-foreground sm:mx-1" aria-hidden />
           {locales.map((code) => (
             <Button
               key={code}
               variant={locale === code ? "secondary" : "ghost"}
               size="xs"
-              className="px-1.5 font-mono text-[11px]"
+              className="px-1 font-mono text-[11px] sm:px-1.5"
               aria-pressed={locale === code}
               disabled={isPending}
               onClick={() => switchLocale(code)}

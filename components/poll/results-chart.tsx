@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { InboxIcon } from "lucide-react";
 import {
   Bar,
@@ -19,6 +19,19 @@ import {
 import { useI18n } from "@/components/i18n-provider";
 import { cn } from "@/lib/utils";
 import type { PollOptionWithVotes } from "@/lib/types/poll";
+
+/** Tracks the sm breakpoint so chart geometry adapts to phones (RU labels are longer). */
+function useIsNarrow(): boolean {
+  const [isNarrow, setIsNarrow] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 640px)");
+    const update = () => setIsNarrow(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+  return isNarrow;
+}
 
 interface ResultsChartProps {
   options: PollOptionWithVotes[];
@@ -47,12 +60,18 @@ type ChartKind = "bars" | "donut";
 export function ResultsChart({ options, totalVotes }: ResultsChartProps) {
   const { dict } = useI18n();
   const [kind, setKind] = useState<ChartKind>("bars");
+  const isNarrow = useIsNarrow();
+
+  // Shorter truncation budget on phones where the axis takes relatively more space.
+  const labelBudget = isNarrow ? 14 : 24;
 
   const chartData = options.map((option, index) => ({
     id: option.id,
     fullLabel: option.label,
     shortLabel:
-      option.label.length > 24 ? `${option.label.slice(0, 23)}…` : option.label,
+      option.label.length > labelBudget
+        ? `${option.label.slice(0, labelBudget - 1)}…`
+        : option.label,
     votes: option.voteCount,
     share: percent(option.voteCount, totalVotes),
     fill: colorAt(index),
@@ -99,7 +118,7 @@ export function ResultsChart({ options, totalVotes }: ResultsChartProps) {
             <BarChart
               data={chartData}
               layout="vertical"
-              margin={{ top: 4, right: 44, bottom: 4, left: 0 }}
+              margin={{ top: 4, right: isNarrow ? 34 : 44, bottom: 4, left: 0 }}
             >
               <CartesianGrid horizontal={false} stroke="var(--border)" strokeDasharray="3 3" />
               <XAxis
@@ -110,7 +129,7 @@ export function ResultsChart({ options, totalVotes }: ResultsChartProps) {
               <YAxis
                 type="category"
                 dataKey="shortLabel"
-                width={140}
+                width={isNarrow ? 96 : 140}
                 tickLine={false}
                 axisLine={false}
                 tick={{ fontSize: 13, fill: "var(--muted-foreground)" }}
@@ -143,7 +162,7 @@ export function ResultsChart({ options, totalVotes }: ResultsChartProps) {
             .map((option) => `${option.label}: ${option.voteCount}`)
             .join(", ")}. ${dict.poll.chart.totalLabel} ${totalVotes}.`}
         >
-          <div className="relative h-56 w-56 shrink-0">
+          <div className="relative h-44 w-44 shrink-0 sm:h-56 sm:w-56">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
