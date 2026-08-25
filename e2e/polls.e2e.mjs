@@ -118,13 +118,19 @@ async function main() {
       `sushi100=${sushiShare} alpha0=${alphaShareZero}`,
     );
 
-    // ---- 7. My polls lists the created poll ----------------------------------
+    // ---- 8. My votes are scoped to the owning session -------------------------
     await owner.goto(`${BASE}/polls`, { waitUntil: "networkidle" });
     await owner
       .getByText("E2E: pizza or sushi?")
       .first()
       .waitFor({ timeout: 15000 });
     record("my_polls_lists_created_poll", true);
+
+    // The participant (different anonymous identity) must NOT see it.
+    await voter.goto(`${BASE}/polls`, { waitUntil: "networkidle" });
+    const leakedToOthers =
+      (await voter.getByText("E2E: pizza or sushi?").count()) > 0;
+    record("my_votes_scoped_to_owner", !leakedToOthers);
 
     // ---- 8. Close poll -> participants rejected ------------------------------
     await owner.goto(pollUrl, { waitUntil: "networkidle" });
