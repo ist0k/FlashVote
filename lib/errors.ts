@@ -1,6 +1,8 @@
 /**
  * Maps typed errors raised by the `create_poll` / `cast_vote` RPCs
- * (PostgREST surfaces them as the error `message`) to user-facing strings.
+ * (PostgREST surfaces them as the error `message`) to stable error keys.
+ * Clients translate the keys into the active language; the strings below
+ * serve as an English fallback.
  */
 const RPC_ERROR_MESSAGES: Record<string, string> = {
   not_authenticated: "Your session expired. Please try again.",
@@ -19,11 +21,11 @@ const RPC_ERROR_MESSAGES: Record<string, string> = {
 
 const DEFAULT_ERROR_MESSAGE = "Something went wrong. Please try again.";
 
-export function rpcErrorMessage(
-  message: string | null | undefined,
-): string | undefined {
-  if (!message) return undefined;
-  return RPC_ERROR_MESSAGES[message];
+/** Returns a stable error key for known RPC failures, null otherwise. */
+export function rpcErrorKey(message: string | null | undefined): string | null {
+  if (!message) return null;
+  if (message in RPC_ERROR_MESSAGES) return message;
+  return null;
 }
 
 export function toUserErrorMessage(error: unknown): string {
@@ -33,12 +35,12 @@ export function toUserErrorMessage(error: unknown): string {
     "message" in error &&
     typeof error.message === "string"
   ) {
-    return rpcErrorMessage(error.message) ?? DEFAULT_ERROR_MESSAGE;
+    return RPC_ERROR_MESSAGES[error.message] ?? DEFAULT_ERROR_MESSAGE;
   }
   return DEFAULT_ERROR_MESSAGE;
 }
 
 /** Typed result for server actions surfaced to client components. */
-export type ActionResult<T> =
+export type ActionResult<T, E extends string = string> =
   | { ok: true; data: T }
-  | { ok: false; error: string };
+  | { ok: false; error: E };

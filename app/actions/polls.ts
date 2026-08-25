@@ -2,10 +2,22 @@
 
 import { revalidatePath } from "next/cache";
 
-import { ActionResult, toUserErrorMessage } from "@/lib/errors";
-import { createPollSchema } from "@/lib/validation";
+import { rpcErrorKey, type ActionResult } from "@/lib/errors";
+import {
+  createPollErrorKey,
+  createPollSchema,
+  type CreatePollErrorKey,
+} from "@/lib/validation";
 import { createClient } from "@/lib/supabase/server";
 import type { PollStatus } from "@/lib/types/poll";
+
+const CREATE_ERROR_KEYS: readonly string[] = [
+  "emptyQuestion",
+  "questionTooLong",
+  "emptyOption",
+  "duplicateOption",
+  "tooFewOptions",
+];
 
 /**
  * Ensures the visitor has an anonymous identity so the poll can be owned and
@@ -26,10 +38,10 @@ async function ensureSession(): Promise<void> {
 
 export async function createPollAction(
   input: unknown,
-): Promise<ActionResult<{ slug: string }>> {
+): Promise<ActionResult<{ slug: string }, CreatePollErrorKey | "not_authenticated" | "generic">> {
   const parsed = createPollSchema.safeParse(input);
   if (!parsed.success) {
-    return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid input." };
+    return { ok: false, error: createPollErrorKey(parsed.error.issues[0]) };
   }
 
   try {
@@ -47,21 +59,33 @@ export async function createPollAction(
       ...(expiresAt !== null ? { p_expires_at: expiresAt } : {}),
     });
 
-    if (error) return { ok: false, error: toUserErrorMessage(error) };
+    if (error) {
+      const key = rpcErrorKey(error.message);
+      const known: CreatePollErrorKey | "not_authenticated" =
+        key === "not_authenticated"
+          ? "not_authenticated"
+          : (key as CreatePollErrorKey);
+      return {
+        ok: false,
+        error: key && (known === "not_authenticated" || known in CREATE_ERROR_KEYS)
+          ? known
+          : "generic",
+      };
+    }
 
     return { ok: true, data: { slug } };
   } catch (error) {
     console.error("[createPollAction]", error);
-    return { ok: false, error: toUserErrorMessage(error) };
+    return { ok: false, error: "generic" };
   }
 }
 
 export async function setPollStatusAction(
   slug: string,
   status: PollStatus,
-): Promise<ActionResult<{ status: PollStatus }>> {
+): Promise<ActionResult<{ status: PollStatus }, "invalid_status" | "forbidden" | "generic">> {
   if (status !== "open" && status !== "closed") {
-    return { ok: false, error: "Invalid status." };
+    return { ok: false, error: "invalid_status" };
   }
 
   try {
@@ -75,21 +99,21 @@ export async function setPollStatusAction(
       .select("slug")
       .maybeSingle();
 
-    if (error) return { ok: false, error: toUserErrorMessage(error) };
-    if (!data) return { ok: false, error: "You can only manage your own polls." };
+    if (error) return { ok: false, error: "generic" };
+    if (!data) return { ok: false, error: "forbidden" };
 
     revalidatePath(`/p/${slug}`);
     revalidatePath("/polls");
     return { ok: true, data: { status } };
   } catch (error) {
     console.error("[setPollStatusAction]", error);
-    return { ok: false, error: toUserErrorMessage(error) };
+    return { ok: false, error: "generic" };
   }
 }
 
 export async function deletePollAction(
   slug: string,
-): Promise<ActionResult<null>> {
+): Promise<ActionResult<null, "forbidden" | "generic">> {
   try {
     const supabase = await createClient();
 
@@ -101,13 +125,13 @@ export async function deletePollAction(
       .select("slug")
       .maybeSingle();
 
-    if (error) return { ok: false, error: toUserErrorMessage(error) };
-    if (!data) return { ok: false, error: "You can only manage your own polls." };
+    if (error) return { ok: false, error: "generic" };
+    if (!data) return { ok: false, error: "forbidden" };
 
     revalidatePath("/polls");
     return { ok: true, data: null };
   } catch (error) {
     console.error("[deletePollAction]", error);
-    return { ok: false, error: toUserErrorMessage(error) };
+    return { ok: false, error: "generic" };
   }
 }

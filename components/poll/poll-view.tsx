@@ -7,9 +7,11 @@ import { toast } from "sonner";
 import { RealtimeBadge } from "@/components/poll/realtime-badge";
 import { ResultsChart } from "@/components/poll/results-chart";
 import { usePollRealtime } from "@/components/poll/use-poll-realtime";
+import { useI18n } from "@/components/i18n-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { rpcErrorMessage, toUserErrorMessage } from "@/lib/errors";
+import { rpcErrorKey, toUserErrorMessage } from "@/lib/errors";
+import { pluralVotes } from "@/lib/i18n/dictionaries";
 import { createClient } from "@/lib/supabase/client";
 import type { PollDetail, PollStatus } from "@/lib/types/poll";
 
@@ -31,6 +33,7 @@ async function ensureAnonSession(): Promise<void> {
 }
 
 export function PollView({ poll: initialPoll, viewerVotedOptionId }: PollViewProps) {
+  const { dict, locale } = useI18n();
   const [status, setStatus] = useState<PollStatus>(initialPoll.status);
   const [isExpired, setIsExpired] = useState(initialPoll.isExpired);
   const [options, setOptions] = useState(initialPoll.options);
@@ -101,10 +104,14 @@ export function PollView({ poll: initialPoll, viewerVotedOptionId }: PollViewPro
       });
 
       if (error) {
-        const message = rpcErrorMessage(error.message);
-        if (message) {
-          toast.error(message);
-          // Our client state may be stale (e.g. the vote landed earlier).
+        const key = rpcErrorKey(error.message);
+        if (key === "not_authenticated") {
+          toast.error(dict.poll.voteErrors.session_expired);
+          void reconcile();
+        } else if (key && key in dict.poll.voteErrors) {
+          toast.error(
+            dict.poll.voteErrors[key as keyof typeof dict.poll.voteErrors],
+          );
           void reconcile();
         } else {
           toast.error(toUserErrorMessage(error));
@@ -124,7 +131,6 @@ export function PollView({ poll: initialPoll, viewerVotedOptionId }: PollViewPro
         })),
       );
       setVotedOptionId(optionId);
-      toast.success("Vote counted!");
     } catch (error) {
       toast.error(toUserErrorMessage(error));
     } finally {
@@ -141,58 +147,56 @@ export function PollView({ poll: initialPoll, viewerVotedOptionId }: PollViewPro
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center gap-2">
         <Badge variant={isOpen ? "secondary" : "outline"}>
-          {status === "closed" ? "Closed" : isExpired ? "Expired" : "Open"}
+          {status === "closed"
+            ? dict.poll.statusClosed
+            : isExpired
+              ? dict.poll.statusExpired
+              : dict.poll.statusOpen}
         </Badge>
         <span className="text-sm text-muted-foreground" aria-live="polite">
-          {totalVotes} {totalVotes === 1 ? "vote" : "votes"}
+          {totalVotes} {pluralVotes(locale, totalVotes)}
         </span>
         <RealtimeBadge status={realtimeStatus} />
       </div>
 
       {!isOpen ? (
         <p className="rounded-lg border border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground">
-          This poll is no longer accepting votes.
+          {dict.poll.closedNotice}
         </p>
       ) : hasVoted ? (
-        <p className="flex items-center gap-2 rounded-lg border border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground">
+        <p className="flex animate-in fade-in slide-in-from-bottom-1 items-center gap-2 rounded-lg border border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground duration-300">
           <CheckCircle2Icon className="size-4 shrink-0 text-primary" aria-hidden />
-          Vote submitted — results update live below.
+          {dict.poll.votedNotice}
         </p>
       ) : (
-        <fieldset className="flex flex-col gap-2" aria-label="Vote options">
-          <legend className="sr-only">Choose an option to vote</legend>
-          {options.map((option) => {
-            const isOwnChoice = option.id === votedOptionId;
-            const isPending = pendingOptionId === option.id;
-            return (
-              <Button
-                key={option.id}
-                variant={isOwnChoice ? "default" : "outline"}
-                size="lg"
-                className="h-auto w-full justify-start px-4 py-3 text-left whitespace-normal"
-                disabled={!isOpen || pendingOptionId !== null}
-                onClick={() => void handleVote(option.id)}
-              >
-                {isPending ? "Voting…" : option.label}
-              </Button>
-            );
-          })}
+        <fieldset className="flex flex-col gap-2" aria-label={dict.poll.voteFieldsetSr}>
+          <legend className="sr-only">{dict.poll.voteFieldsetSr}</legend>
+          {options.map((option) => (
+            <Button
+              key={option.id}
+              variant="outline"
+              size="lg"
+              className="h-auto w-full justify-start px-4 py-3 text-left whitespace-normal transition-all duration-150 hover:-translate-y-px hover:border-primary/40 hover:bg-accent/50 active:translate-y-0 active:scale-[0.99]"
+              disabled={!isOpen || pendingOptionId !== null}
+              onClick={() => void handleVote(option.id)}
+            >
+              {pendingOptionId === option.id ? dict.poll.voting : option.label}
+            </Button>
+          ))}
         </fieldset>
       )}
 
       <section aria-labelledby="results-heading" className="flex flex-col gap-3">
-        <div className="flex items-center justify-between">
-          <h2 id="results-heading" className="text-sm font-medium text-muted-foreground">
-            Live results
-          </h2>
-        </div>
+        <h2 id="results-heading" className="text-sm font-medium text-muted-foreground">
+          {dict.poll.resultsHeading}
+        </h2>
         <ResultsChart options={options} totalVotes={totalVotes} />
       </section>
 
-      {hasVoted ? (
+      {hasVoted && votedOptionId ? (
         <p className="sr-only">
-          You voted for{" "}
-          {options.find((option) => option.id === votedOptionId)?.label ?? "an option"}.
+          {dict.poll.youVotedForSr}{" "}
+          {options.find((option) => option.id === votedOptionId)?.label}
         </p>
       ) : null}
     </div>
