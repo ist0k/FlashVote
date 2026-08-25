@@ -161,6 +161,10 @@ export type Database = {
         Args: { p_option_id: string; p_slug: string }
         Returns: Json
       }
+      change_vote: {
+        Args: { p_option_id: string; p_slug: string }
+        Returns: Json
+      }
       create_poll: {
         Args: { p_expires_at?: string; p_options: string[]; p_question: string }
         Returns: string

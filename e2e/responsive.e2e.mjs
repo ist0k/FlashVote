@@ -1,4 +1,4 @@
-import { chromium } from "playwright";
+﻿import { chromium } from "playwright";
 
 const BASE = process.env.BASE_URL ?? "http://localhost:3000";
 const VIEWPORTS = [
@@ -37,7 +37,7 @@ async function main() {
       const textboxes = page.getByRole("textbox");
       await textboxes.nth(1).fill("A");
       await textboxes.nth(2).fill("B");
-      await page.getByRole("button", { name: /Create poll|Создать опрос/ }).click();
+      await page.getByRole("button", { name: /Create vote|Создать голосование/ }).click();
       await page.waitForURL(/\/p\/[a-z0-9]+/, { timeout: 20000 });
       const pollPath = new URL(page.url()).pathname;
 

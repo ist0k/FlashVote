@@ -41,9 +41,11 @@ export function PollView({ poll: initialPoll, viewerVotedOptionId }: PollViewPro
     viewerVotedOptionId,
   );
   const [pendingOptionId, setPendingOptionId] = useState<string | null>(null);
+  const [isChangingVote, setIsChangingVote] = useState(false);
 
   const isOpen = status === "open" && !isExpired;
   const hasVoted = votedOptionId !== null;
+  const showVoteButtons = !hasVoted || isChangingVote;
 
   /** Refetches authoritative poll state and reconciles local UI state. */
   const reconcile = useCallback(async () => {
@@ -90,7 +92,7 @@ export function PollView({ poll: initialPoll, viewerVotedOptionId }: PollViewPro
     onChange: reconcile,
   });
 
-  async function handleVote(optionId: string) {
+  async function submitChoice(optionId: string) {
     if (pendingOptionId !== null) return;
     setPendingOptionId(optionId);
 
@@ -98,7 +100,12 @@ export function PollView({ poll: initialPoll, viewerVotedOptionId }: PollViewPro
     try {
       await ensureAnonSession();
 
-      const { data, error } = await supabase.rpc("cast_vote", {
+      // First choice uses cast_vote; a re-selection while changing uses
+      // change_vote, which moves the existing vote between counters.
+      const rpcName =
+        hasVoted && isChangingVote ? "change_vote" : "cast_vote";
+
+      const { data, error } = await supabase.rpc(rpcName, {
         p_slug: initialPoll.slug,
         p_option_id: optionId,
       });
@@ -119,7 +126,9 @@ export function PollView({ poll: initialPoll, viewerVotedOptionId }: PollViewPro
         return;
       }
 
-      const counts = (data as { counts?: Record<string, number> } | null)?.counts;
+      const counts = (
+        data as { counts?: Record<string, number>; changed?: boolean } | null
+      )?.counts;
 
       setOptions((current) =>
         current.map((option) => ({
@@ -127,10 +136,13 @@ export function PollView({ poll: initialPoll, viewerVotedOptionId }: PollViewPro
           voteCount:
             counts && option.id in counts
               ? (counts[option.id] as number)
-              : option.voteCount + (option.id === optionId ? 1 : 0),
+              : option.voteCount +
+                (option.id === optionId ? 1 : 0) -
+                (!isChangingVote && hasVoted && option.id === votedOptionId ? 1 : 0),
         })),
       );
       setVotedOptionId(optionId);
+      setIsChangingVote(false);
     } catch (error) {
       toast.error(toUserErrorMessage(error));
     } finally {
@@ -163,27 +175,54 @@ export function PollView({ poll: initialPoll, viewerVotedOptionId }: PollViewPro
         <p className="rounded-lg border border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground">
           {dict.poll.closedNotice}
         </p>
-      ) : hasVoted ? (
-        <p className="flex animate-in fade-in slide-in-from-bottom-1 items-center gap-2 rounded-lg border border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground duration-300">
-          <CheckCircle2Icon className="size-4 shrink-0 text-primary" aria-hidden />
-          {dict.poll.votedNotice}
-        </p>
-      ) : (
+      ) : showVoteButtons ? (
         <fieldset className="flex flex-col gap-2" aria-label={dict.poll.voteFieldsetSr}>
           <legend className="sr-only">{dict.poll.voteFieldsetSr}</legend>
-          {options.map((option) => (
+          {options.map((option) => {
+            const isCurrentChoice = option.id === votedOptionId;
+            return (
+              <Button
+                key={option.id}
+                variant={isChangingVote && isCurrentChoice ? "default" : "outline"}
+                size="lg"
+                className="h-auto w-full justify-start px-4 py-3 text-left whitespace-normal break-words transition-all duration-150 hover:-translate-y-px hover:border-primary/40 hover:bg-accent/50 active:translate-y-0 active:scale-[0.99]"
+                disabled={!isOpen || pendingOptionId !== null}
+                onClick={() => void submitChoice(option.id)}
+              >
+                {pendingOptionId === option.id
+                  ? dict.poll.voting
+                  : isChangingVote && isCurrentChoice
+                    ? `${option.label} ✓`
+                    : option.label}
+              </Button>
+            );
+          })}
+          {isChangingVote ? (
             <Button
-              key={option.id}
-              variant="outline"
-              size="lg"
-              className="h-auto w-full justify-start px-4 py-3 text-left whitespace-normal break-words transition-all duration-150 hover:-translate-y-px hover:border-primary/40 hover:bg-accent/50 active:translate-y-0 active:scale-[0.99]"
-              disabled={!isOpen || pendingOptionId !== null}
-              onClick={() => void handleVote(option.id)}
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsChangingVote(false)}
+              disabled={pendingOptionId !== null}
             >
-              {pendingOptionId === option.id ? dict.poll.voting : option.label}
+              {dict.manage.cancel}
             </Button>
-          ))}
+          ) : null}
         </fieldset>
+      ) : (
+        <div className="flex animate-in fade-in slide-in-from-bottom-1 flex-col gap-2 rounded-lg border border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground duration-300 sm:flex-row sm:items-center sm:justify-between">
+          <p className="flex items-center gap-2">
+            <CheckCircle2Icon className="size-4 shrink-0 text-primary" aria-hidden />
+            {dict.poll.votedNotice}
+          </p>
+          <Button
+            variant="outline"
+            size="sm"
+            className="shrink-0 transition-transform duration-150 hover:-translate-y-px"
+            onClick={() => setIsChangingVote(true)}
+          >
+            {dict.poll.changeVote}
+          </Button>
+        </div>
       )}
 
       <section aria-labelledby="results-heading" className="flex flex-col gap-3">
