@@ -83,13 +83,23 @@ export interface OwnedPollSummary {
   totalVotes: number;
 }
 
-/** Lists polls owned by the current user (most recent first). */
+/**
+ * Lists votes owned by the current session (most recent first).
+ * The filter is explicit because the public-read RLS policy on `polls`
+ * intentionally allows everyone to open shared links.
+ */
 export async function getOwnedPolls(): Promise<OwnedPollSummary[]> {
   const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return [];
 
   const { data, error } = await supabase
     .from("polls")
     .select("id, slug, question, status, expires_at, created_at, poll_results(vote_count)")
+    .eq("owner_id", user.id)
     .order("created_at", { ascending: false })
     .limit(100);
 
