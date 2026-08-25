@@ -7,39 +7,35 @@ import {
   POLL_QUESTION_MAX_LENGTH,
 } from "@/lib/constants";
 
-/** Expiry choices offered by the creation form (in seconds). */
-export const EXPIRY_CHOICES = [
-  { label: "No expiry", value: null },
-  { label: "1 hour", value: 60 * 60 },
-  { label: "1 day", value: 60 * 60 * 24 },
-  { label: "1 week", value: 60 * 60 * 24 * 7 },
-] as const;
+/**
+ * Stable validation error keys. Server actions return these; the client
+ * translates them via `dict.form.errors`.
+ */
+export type CreatePollErrorKey =
+  | "emptyQuestion"
+  | "questionTooLong"
+  | "emptyOption"
+  | "duplicateOption"
+  | "tooFewOptions"
+  | "generic";
 
 export const createPollSchema = z.object({
   question: z
     .string()
     .trim()
-    .min(1, "Please enter a question.")
-    .max(
-      POLL_QUESTION_MAX_LENGTH,
-      `Question must be at most ${POLL_QUESTION_MAX_LENGTH} characters.`,
-    ),
+    .min(1)
+    .max(POLL_QUESTION_MAX_LENGTH),
   options: z
     .array(
       z
         .string()
         .trim()
-        .min(1, "Options cannot be empty.")
-        .max(
-          POLL_OPTION_MAX_LENGTH,
-          `Options must be at most ${POLL_OPTION_MAX_LENGTH} characters.`,
-        ),
+        .min(1)
+        .max(POLL_OPTION_MAX_LENGTH),
     )
-    .min(POLL_MIN_OPTIONS, `Add at least ${POLL_MIN_OPTIONS} options.`)
-    .max(POLL_MAX_OPTIONS, `Add at most ${POLL_MAX_OPTIONS} options.`)
-    .refine((options) => new Set(options).size === options.length, {
-      message: "Options must be unique.",
-    }),
+    .min(POLL_MIN_OPTIONS)
+    .max(POLL_MAX_OPTIONS)
+    .refine((options) => new Set(options).size === options.length),
   expiresInSeconds: z
     .number()
     .int()
@@ -47,5 +43,24 @@ export const createPollSchema = z.object({
     .max(60 * 60 * 24 * 31)
     .nullable(),
 });
+
+/** Maps a failed Zod parse to a user-facing error key. */
+export function createPollErrorKey(
+  issue: z.core.$ZodIssue | undefined,
+): CreatePollErrorKey {
+  if (!issue) return "generic";
+  const path = issue.path.join(".");
+  if (path === "question") {
+    return issue.input === undefined || issue.input === "" || (typeof issue.input === "string" && issue.input.trim() === "")
+      ? "emptyQuestion"
+      : "questionTooLong";
+  }
+  if (path.startsWith("options")) {
+    if (issue.code === "too_small") return issue.path.length > 1 ? "emptyOption" : "tooFewOptions";
+    if (issue.code === "custom") return "duplicateOption";
+    if (issue.code === "too_big") return issue.path.length > 1 ? "generic" : "generic";
+  }
+  return "generic";
+}
 
 export type CreatePollInput = z.infer<typeof createPollSchema>;

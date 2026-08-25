@@ -19,9 +19,10 @@ async function newBrowser() {
 async function main() {
   const browser = await newBrowser();
 
-  // Context A = poll owner, Context B = participant (separate anon identities)
-  const ctxA = await browser.newContext();
-  const ctxB = await browser.newContext();
+  // Context A = poll owner, Context B = participant (separate anon identities).
+  // Locale pinned to EN so assertions match the English dictionary.
+  const ctxA = await browser.newContext({ locale: "en-US" });
+  const ctxB = await browser.newContext({ locale: "en-US" });
   const owner = await ctxA.newPage();
   const voter = await ctxB.newPage();
 
@@ -133,6 +134,21 @@ async function main() {
       resp?.status() === 404 && notFoundText,
       `status=${resp?.status()}`,
     );
+
+    // ---- 10. Language switcher applies instantly ------------------------------
+    await voter.goto(`${BASE}/polls`, { waitUntil: "networkidle" });
+    await voter.getByRole("button", { name: "RU", exact: true }).click();
+    let ruApplied = false;
+    try {
+      // Header nav link is rendered from the active dictionary.
+      await voter
+        .getByRole("link", { name: "Мои опросы" })
+        .waitFor({ timeout: 10000 });
+      ruApplied = true;
+    } catch {}
+    record("language_switches_to_russian_live", ruApplied);
+    const htmlLang = await voter.evaluate(() => document.documentElement.lang);
+    record("html_lang_attribute_updates", htmlLang === "ru", `lang=${htmlLang}`);
   } catch (error) {
     record("unexpected_error", false, String(error).slice(0, 300));
   }
