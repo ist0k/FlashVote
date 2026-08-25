@@ -206,26 +206,30 @@ export function ResultsChart({ options, totalVotes }: ResultsChartProps) {
         </div>
       )}
 
-      {/* Textual alternative for screen readers */}
-      <table className="sr-only">
-        <caption>{dict.poll.chart.tableCaption}</caption>
-        <thead>
-          <tr>
-            <th scope="col">{dict.poll.chart.colOption}</th>
-            <th scope="col">{dict.poll.chart.colVotes}</th>
-            <th scope="col">{dict.poll.chart.colShare}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {options.map((option) => (
-            <tr key={option.id}>
-              <td>{option.label}</td>
-              <td>{option.voteCount}</td>
-              <td>{percent(option.voteCount, totalVotes)}%</td>
+      {/* Textual alternative for screen readers. Wrapped in a div because
+          overflow-hidden on a <table> does NOT clip its <caption>, which
+          otherwise renders visibly over the chart. */}
+      <div className="sr-only">
+        <table>
+          <caption>{dict.poll.chart.tableCaption}</caption>
+          <thead>
+            <tr>
+              <th scope="col">{dict.poll.chart.colOption}</th>
+              <th scope="col">{dict.poll.chart.colVotes}</th>
+              <th scope="col">{dict.poll.chart.colShare}</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {options.map((option) => (
+              <tr key={option.id}>
+                <td>{option.label}</td>
+                <td>{option.voteCount}</td>
+                <td>{percent(option.voteCount, totalVotes)}%</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

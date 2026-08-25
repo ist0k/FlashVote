@@ -71,9 +71,14 @@ export function MyPollsView({ polls }: MyPollsViewProps) {
 
   return (
     <div className="mx-auto flex w-full max-w-2xl animate-in fade-in flex-col gap-6 px-4 py-10 duration-500">
-      <div className="flex items-center justify-between">
-        <h1 className="font-heading text-2xl font-semibold">{dict.myPolls.title}</h1>
-        <Button asChild size="sm">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <h1 className="font-heading text-2xl font-semibold">{dict.myPolls.title}</h1>
+          <p className="mt-1 max-w-md text-xs text-muted-foreground">
+            {dict.myPolls.hint}
+          </p>
+        </div>
+        <Button asChild size="sm" className="shrink-0">
           <Link href="/">
             <PlusIcon data-icon="inline-start" />
             {dict.myPolls.newPoll}

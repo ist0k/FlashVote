@@ -37,20 +37,20 @@ async function main() {
     await owner.getByRole("textbox", { name: "Option 1", exact: true }).fill("Pizza");
     await owner.getByRole("textbox", { name: "Option 2", exact: true }).fill("Pizza");
     const createDisabledOnDuplicates = await owner
-      .getByRole("button", { name: "Create poll" })
+      .getByRole("button", { name: "Create vote" })
       .isDisabled();
     record("validation_rejects_duplicate_options", createDisabledOnDuplicates);
 
     // ---- 3. Create poll successfully ---------------------------------------
     await owner.getByRole("textbox", { name: "Option 2", exact: true }).fill("Sushi");
-    await owner.getByRole("button", { name: "Create poll" }).click();
+    await owner.getByRole("button", { name: "Create vote" }).click();
     await owner.waitForURL(/\/p\/[a-z0-9]+/, { timeout: 20000 });
     const pollUrl = owner.url();
     const slug = pollUrl.split("/").pop();
     record("create_poll_redirects_to_slug", /[a-z0-9]{8,16}/.test(slug), slug);
 
     // Owner panel with QR is visible
-    await owner.getByText("You own this poll").waitFor({ timeout: 15000 });
+    await owner.getByText("You own this vote").waitFor({ timeout: 15000 });
     record("owner_panel_with_qr_visible", true);
 
     // Share link input contains the URL
@@ -85,19 +85,38 @@ async function main() {
     } catch {}
     record("duplicate_vote_blocked_after_reload", stillBlocked);
 
-    // ---- 6. Realtime: owner page updates without reload ----------------------
+    // ---- 6. Change vote: switch from Pizza to Sushi --------------------------
+    await voter.getByRole("button", { name: /Change vote/i }).click();
+    await voter.getByRole("button", { name: "Sushi", exact: true }).click();
+    let voteChanged = false;
+    try {
+      await voter.getByText(/Vote submitted/i).waitFor({ timeout: 60000 });
+      voteChanged = true;
+    } catch {}
+    record("vote_can_be_changed", voteChanged);
+
+    // ---- 7. Realtime: owner page reflects the (changed) single vote ----------
     await owner.goto(pollUrl, { waitUntil: "networkidle" });
-    const zeroVotesVisible = await owner
-      .getByText(/^0 votes$/)
-      .isVisible()
-      .catch(() => false);
     await owner
       .getByText(/^1 vote$/)
       .waitFor({ timeout: 20000 })
-      .then(() =>
-        record("realtime_updates_owner_view", true, `startedAtZero=${zeroVotesVisible}`),
-      )
+      .then(() => record("realtime_updates_owner_view", true))
       .catch(() => record("realtime_updates_owner_view", false, "count never reached 1"));
+    const sushiShare = await owner
+      .locator("text=100%")
+      .first()
+      .isVisible()
+      .catch(() => false);
+    const alphaShareZero = await owner
+      .locator("text=0%")
+      .first()
+      .isVisible()
+      .catch(() => false);
+    record(
+      "changed_vote_redistributes_counts",
+      sushiShare && alphaShareZero,
+      `sushi100=${sushiShare} alpha0=${alphaShareZero}`,
+    );
 
     // ---- 7. My polls lists the created poll ----------------------------------
     await owner.goto(`${BASE}/polls`, { waitUntil: "networkidle" });
@@ -109,9 +128,9 @@ async function main() {
 
     // ---- 8. Close poll -> participants rejected ------------------------------
     await owner.goto(pollUrl, { waitUntil: "networkidle" });
-    await owner.getByRole("button", { name: "Close poll" }).click();
+    await owner.getByRole("button", { name: "Close voting" }).click();
     await owner
-      .getByText("Poll closed")
+      .getByText("Vote closed")
       .or(owner.getByText("Closed"))
       .first()
       .waitFor({ timeout: 15000 });
@@ -120,7 +139,7 @@ async function main() {
     let closedRejected = false;
     try {
       await voter
-        .getByText("This poll is no longer accepting votes.")
+        .getByText("Voting has ended for this vote.")
         .waitFor({ timeout: 20000 });
       closedRejected = true;
     } catch {}
@@ -142,7 +161,7 @@ async function main() {
     try {
       // Header nav link is rendered from the active dictionary.
       await voter
-        .getByRole("link", { name: "Мои опросы" })
+        .getByRole("link", { name: "Мои голосования" })
         .waitFor({ timeout: 10000 });
       ruApplied = true;
     } catch {}

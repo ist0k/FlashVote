@@ -18,6 +18,7 @@ export function MyPollsEmpty() {
       <div className="flex flex-col gap-2">
         <h1 className="font-heading text-2xl font-semibold">{dict.myPolls.emptyTitle}</h1>
         <p className="text-muted-foreground">{dict.myPolls.emptyText}</p>
+        <p className="text-xs text-muted-foreground/80">{dict.myPolls.hint}</p>
       </div>
       <Button asChild size="lg">
         <Link href="/">
