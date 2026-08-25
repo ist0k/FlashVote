@@ -1,0 +1,833 @@
+[
+  {
+    "id": "TC001",
+    "title": "Create a poll and reach the owner view",
+    "description": "This verifies that a creator can submit a valid poll and arrive at the poll page with owner controls available.",
+    "category": "Create poll",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the question field with a valid poll question"
+      },
+      {
+        "type": "action",
+        "description": "Fill in at least two answer option fields with unique options"
+      },
+      {
+        "type": "action",
+        "description": "Select a valid expiry time"
+      },
+      {
+        "type": "action",
+        "description": "Submit the poll creation form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the poll page is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the owner management panel is visible"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC002",
+    "title": "Create a poll and reach its voting page",
+    "description": "This verifies that a new poll can be created from the landing page and that the user is taken to the poll page afterward.",
+    "category": "Owner poll management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Fill in a poll question"
+      },
+      {
+        "type": "action",
+        "description": "Add at least two poll options"
+      },
+      {
+        "type": "action",
+        "description": "Submit the poll form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user lands on a poll page"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the new poll is available for voting"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC003",
+    "title": "Delete a poll with confirmation and return to the dashboard",
+    "description": "This verifies that the owner can delete a poll after confirming the dialog and is returned to the polls dashboard.",
+    "category": "Owner poll management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Fill in a poll question"
+      },
+      {
+        "type": "action",
+        "description": "Add at least two poll options"
+      },
+      {
+        "type": "action",
+        "description": "Submit the poll form"
+      },
+      {
+        "type": "action",
+        "description": "Open the owner management panel"
+      },
+      {
+        "type": "action",
+        "description": "Delete the poll"
+      },
+      {
+        "type": "action",
+        "description": "Confirm the deletion"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user returns to the polls dashboard"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the deleted poll is no longer visible"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC004",
+    "title": "Vote in a shared poll and see the result update",
+    "description": "This verifies that a participant can cast a vote from a public poll page and see the results update afterward.",
+    "category": "Vote in poll",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /p/[slug]"
+      },
+      {
+        "type": "action",
+        "description": "Select one available answer option"
+      },
+      {
+        "type": "action",
+        "description": "Submit the vote"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a vote confirmation is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the results update is visible"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC005",
+    "title": "Close and reopen a poll from the owner panel",
+    "description": "This verifies that the owner can close a poll to stop voting and then reopen it to make voting available again.",
+    "category": "Owner poll management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Fill in a poll question"
+      },
+      {
+        "type": "action",
+        "description": "Add at least two poll options"
+      },
+      {
+        "type": "action",
+        "description": "Submit the poll form"
+      },
+      {
+        "type": "action",
+        "description": "Open the owner management panel"
+      },
+      {
+        "type": "action",
+        "description": "Close the poll"
+      },
+      {
+        "type": "action",
+        "description": "Reopen the poll"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the poll is open for voting again"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the voting controls are available"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC006",
+    "title": "Delete a poll after confirming the action",
+    "description": "This verifies that an owner can delete a poll and is returned to the My polls dashboard afterward.",
+    "category": "My polls dashboard",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /polls"
+      },
+      {
+        "type": "action",
+        "description": "Open an owned poll from the dashboard"
+      },
+      {
+        "type": "action",
+        "description": "Open the delete confirmation"
+      },
+      {
+        "type": "action",
+        "description": "Confirm the deletion"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the My polls dashboard is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the deleted poll is no longer visible"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC007",
+    "title": "Return to the same browser session and open My polls",
+    "description": "This verifies that polls created in the current browser session appear on the My polls dashboard.",
+    "category": "My polls dashboard",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /polls"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the current session's polls are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify at least one owned poll card is visible"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC008",
+    "title": "See owned polls and vote counts on the dashboard",
+    "description": "This verifies that polls created in the current browser session appear on the My polls dashboard with their current vote counts.",
+    "category": "My polls dashboard",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Fill in a poll question"
+      },
+      {
+        "type": "action",
+        "description": "Add at least two poll options"
+      },
+      {
+        "type": "action",
+        "description": "Submit the poll form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /polls"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the created poll appears in the dashboard list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the poll vote count is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC009",
+    "title": "Copy the poll link from the owner panel",
+    "description": "This verifies that the poll owner can copy the share link from the management panel after creating a poll.",
+    "category": "Owner poll management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Fill in a poll question"
+      },
+      {
+        "type": "action",
+        "description": "Add at least two poll options"
+      },
+      {
+        "type": "action",
+        "description": "Submit the poll form"
+      },
+      {
+        "type": "action",
+        "description": "Open the owner management panel"
+      },
+      {
+        "type": "action",
+        "description": "Copy the poll link"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a copy confirmation is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the poll sharing controls remain available"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC010",
+    "title": "Prevent voting twice in the same browser session",
+    "description": "This verifies that a participant cannot submit a second vote from the same browser session and sees an already voted message.",
+    "category": "Vote in poll",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /p/[slug]"
+      },
+      {
+        "type": "action",
+        "description": "Select one available answer option"
+      },
+      {
+        "type": "action",
+        "description": "Submit the vote"
+      },
+      {
+        "type": "action",
+        "description": "Try to submit another vote"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an already voted message is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify voting choices are no longer available"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC011",
+    "title": "Prevent voting on a closed poll and allow voting after reopening",
+    "description": "This verifies that a closed poll is read-only for voters and that reopening restores voting access.",
+    "category": "Owner poll management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Fill in a poll question"
+      },
+      {
+        "type": "action",
+        "description": "Add at least two poll options"
+      },
+      {
+        "type": "action",
+        "description": "Submit the poll form"
+      },
+      {
+        "type": "action",
+        "description": "Close the poll from the owner panel"
+      },
+      {
+        "type": "action",
+        "description": "Return to the poll voting view"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify voting is disabled on the closed poll"
+      },
+      {
+        "type": "action",
+        "description": "Reopen the poll from the owner panel"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify voting becomes available again"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC012",
+    "title": "Create a poll with no expiry",
+    "description": "This verifies that a creator can choose no expiry and still successfully create a poll.",
+    "category": "Create poll",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the question field with a valid poll question"
+      },
+      {
+        "type": "action",
+        "description": "Fill in at least two answer option fields with unique options"
+      },
+      {
+        "type": "action",
+        "description": "Select no expiry"
+      },
+      {
+        "type": "action",
+        "description": "Submit the poll creation form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the poll page is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the poll is open for voting"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC013",
+    "title": "Create a poll and share it from the owner panel",
+    "description": "This verifies that after creating a poll the owner can access sharing controls from the poll page.",
+    "category": "Create poll",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the question field with a valid poll question"
+      },
+      {
+        "type": "action",
+        "description": "Fill in at least two answer option fields with unique options"
+      },
+      {
+        "type": "action",
+        "description": "Submit the poll creation form"
+      },
+      {
+        "type": "action",
+        "description": "Open the sharing controls in the owner panel"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify sharing controls are visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a share link can be accessed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC014",
+    "title": "Share a poll by email from the owner panel",
+    "description": "This verifies that the owner can initiate email sharing for a created poll from the management panel.",
+    "category": "Owner poll management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Fill in a poll question"
+      },
+      {
+        "type": "action",
+        "description": "Add at least two poll options"
+      },
+      {
+        "type": "action",
+        "description": "Submit the poll form"
+      },
+      {
+        "type": "action",
+        "description": "Open the owner management panel"
+      },
+      {
+        "type": "action",
+        "description": "Start sharing the poll by email"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the email share controls are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the poll remains accessible from the owner panel"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC015",
+    "title": "Open an existing poll from My polls to manage it",
+    "description": "This verifies that a poll card on the dashboard opens the full management view for that poll.",
+    "category": "My polls dashboard",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /polls"
+      },
+      {
+        "type": "action",
+        "description": "Select an owned poll card"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the poll page is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the owner management panel is visible"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC016",
+    "title": "View the poll QR code from the owner panel",
+    "description": "This verifies that the owner can open the poll QR code in the management panel for sharing.",
+    "category": "Owner poll management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Fill in a poll question"
+      },
+      {
+        "type": "action",
+        "description": "Add at least two poll options"
+      },
+      {
+        "type": "action",
+        "description": "Submit the poll form"
+      },
+      {
+        "type": "action",
+        "description": "Open the owner management panel"
+      },
+      {
+        "type": "action",
+        "description": "Open the poll QR code view"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the QR code is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the poll sharing panel remains visible"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC017",
+    "title": "Open an existing poll from the dashboard",
+    "description": "This verifies that a poll card in the dashboard opens the poll details and management view for a session-owned poll.",
+    "category": "My polls dashboard",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Fill in a poll question"
+      },
+      {
+        "type": "action",
+        "description": "Add at least two poll options"
+      },
+      {
+        "type": "action",
+        "description": "Submit the poll form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /polls"
+      },
+      {
+        "type": "action",
+        "description": "Open the poll card"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the poll page is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the owner management panel is available"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC018",
+    "title": "Add and remove answer options before creating a poll",
+    "description": "This verifies that a creator can adjust the option count during poll setup and still create a valid poll.",
+    "category": "Create poll",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the question field with a valid poll question"
+      },
+      {
+        "type": "action",
+        "description": "Fill in two answer option fields with unique options"
+      },
+      {
+        "type": "action",
+        "description": "Add another answer option"
+      },
+      {
+        "type": "action",
+        "description": "Remove one answer option"
+      },
+      {
+        "type": "action",
+        "description": "Submit the poll creation form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the poll page is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the poll owner controls are visible"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC019",
+    "title": "Create a poll and open QR and email share options",
+    "description": "This verifies that the owner panel exposes QR code and email sharing controls after poll creation.",
+    "category": "Create poll",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the question field with a valid poll question"
+      },
+      {
+        "type": "action",
+        "description": "Fill in at least two answer option fields with unique options"
+      },
+      {
+        "type": "action",
+        "description": "Submit the poll creation form"
+      },
+      {
+        "type": "action",
+        "description": "Open the sharing controls in the owner panel"
+      },
+      {
+        "type": "action",
+        "description": "Expand the QR code sharing option"
+      },
+      {
+        "type": "action",
+        "description": "Expand the email sharing option"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the QR code sharing content is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the email sharing control is visible"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC020",
+    "title": "Use the new poll entry point from an empty dashboard",
+    "description": "This verifies that a first-time visitor sees the empty dashboard state and can start creating a poll from there.",
+    "category": "My polls dashboard",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /polls"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an empty state message is visible"
+      },
+      {
+        "type": "action",
+        "description": "Start creating a new poll"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the poll creation form is displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC021",
+    "title": "Prevent creating a poll without a question",
+    "description": "This verifies that submitting an empty question is blocked and a validation toast is shown.",
+    "category": "Create poll",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Leave the question field empty"
+      },
+      {
+        "type": "action",
+        "description": "Fill in at least two answer option fields with unique options"
+      },
+      {
+        "type": "action",
+        "description": "Submit the poll creation form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a validation error is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the poll page is not displayed"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC022",
+    "title": "Prevent creating a poll with invalid options",
+    "description": "This verifies that duplicate or empty answer options are rejected during poll creation.",
+    "category": "Create poll",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the question field with a valid poll question"
+      },
+      {
+        "type": "action",
+        "description": "Fill in one empty answer option and one duplicate answer option"
+      },
+      {
+        "type": "action",
+        "description": "Submit the poll creation form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a validation error is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the poll page is not displayed"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC023",
+    "title": "View a closed poll as read-only",
+    "description": "This verifies that a closed poll no longer allows voting and is shown in a read-only state.",
+    "category": "Vote in poll",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /p/[slug]"
+      },
+      {
+        "type": "action",
+        "description": "Open the owner management panel"
+      },
+      {
+        "type": "action",
+        "description": "Close the poll"
+      },
+      {
+        "type": "action",
+        "description": "Return to the public poll view"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the poll is shown as closed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify voting choices are unavailable"
+      }
+    ],
+    "priority": "Low"
+  }
+]
